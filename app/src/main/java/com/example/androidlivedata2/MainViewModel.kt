@@ -7,28 +7,38 @@ import androidx.lifecycle.ViewModel
 
 class MainViewModel :ViewModel(){
 
-    private var _mutableCount = MutableLiveData(0)
-    val liveCount : LiveData<Int>
-    get() = _mutableCount
+    private var _mutableWord = MutableLiveData("")
+    val liveWord : LiveData<String>
+    //값을 받아줄 getter
+        get() = _mutableWord
+    private var _randomMutableWord = MutableLiveData("")
+    val randomliveWord : LiveData<String>
+        //값을 받아줄 getter
+        get() = _mutableWord
 
-    //map을 활용하여 가공
-    val mapLiveData = Transformations.map(liveCount){
-        it+it
-    }
-    //switchMap을 활용하여 가공
-    val switchMapLiveData = Transformations.switchMap(liveCount){
-        changeValue(it)
-    }
-    fun changeValue(count : Int) : MutableLiveData<Int>{
-        val testLiveData = MutableLiveData(count * count)
-
-        return testLiveData
+    val newData = Transformations.switchMap(liveWord){
+        getRandomWordShuffled(it)
     }
 
-    fun setLiveDataValue(count : Int){
-        _mutableCount.value = count
+    init {
+        getNextData()
     }
 
+    fun getNextData(){
+        val currentWord = testDataList.random()
+        val randomWord = currentWord.toCharArray()
+        randomWord.shuffle()
 
+        _mutableWord.value = currentWord
+        _randomMutableWord.value = String(randomWord)
 
+    }
+
+    fun getRandomWordShuffled(word: String): MutableLiveData<String>{
+        val liveData = MutableLiveData("")
+        val randomTextWord = word.toCharArray()
+        randomTextWord.shuffle()
+        liveData.value = String(randomTextWord)
+        return liveData
+    }
 }
